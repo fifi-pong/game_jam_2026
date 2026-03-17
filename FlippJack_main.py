@@ -1,9 +1,9 @@
-import pygame, random
+"""import pygame, random
 
 # 1. Oppsett
 class FlippJack:
     pygame.init()
-    skjerm = pygame.display.set_mode((800, 600))
+    self.skjerm = pygame.display.set_mode((800, 600))
     kjorer = True
 
 # 2. Spill-løkken (Game Loop)
@@ -15,4 +15,4 @@ while kjorer:
     skjerm.fill((0, 0, 0)) # Gjør skjermen svart
     pygame.display.flip()  # Oppdater skjermen
 
-pygame.quit()
+pygame.quit()"""
