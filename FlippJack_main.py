@@ -6,7 +6,29 @@ class FlippJack:
         pygame.init()
         self.skjerm = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
+        self.keys = pygame.key.get_pressed()
         self.running = True
+
+    def main_loop(self):
+        self.handel_event()
+        self.update()
+        self.render()
+
+    def handel_event(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+        self.keys = pygame.key.get_pressed()
+
+    def update(self):
+        self.clock.tick(60)
+
+    def render(self):
+        self.skjerm.fill("white")
+        
+        pygame.display.flip()
+    
 
 class Objecter:
     def __init__(self):
@@ -32,17 +54,6 @@ class Vegger(Objecter):
         super().__init__()
         pass
 
-
-
-"""
-# 2. Spill-løkken (Game Loop)
-while kjorer:
-    for hendelse in pygame.event.get():
-        if hendelse.type == pygame.QUIT:
-            kjorer = False
-            
-    skjerm.fill((0, 0, 0)) # Gjør skjermen svart
-    pygame.display.flip()  # Oppdater skjermen
-
-pygame.quit()
-"""
+spill = FlippJack()
+while spill.running:
+    spill.main_loop()
