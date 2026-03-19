@@ -1,11 +1,9 @@
-import pygame, random
-import Spiller
+import pygame, random, math, sys
 
 # 1. Oppsett
 class FlippJack:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("FlippJack")
         self.skjerm = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
         self.keys = pygame.key.get_pressed()
@@ -28,13 +26,24 @@ class FlippJack:
 
     def render(self):
         self.skjerm.fill("white")
-        
         pygame.display.flip()
     
-
+#gjennerel oppsett
 class Objecter:
-    def __init__(self):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = (100, 100, 100)
+        self.rect = pygame.Rect(x - width // 2, y - height // 2, width, height)
+
+    def update(self):
         pass
+
+    def render(self):
+        pass
+
 
 class Spiller(Objecter):
     def __init__(self):
