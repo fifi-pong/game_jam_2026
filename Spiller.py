@@ -1,6 +1,18 @@
 import pygame, random, math
 import FlippJack_main
 
+# --- FARGER ---
+MORK_BLA    = (5, 5, 20)
+HVIT        = (255, 255, 255)
+GRA         = (150, 150, 150)
+MORK_GRA    = (60, 60, 60)
+CYAN        = (0, 255, 255)
+GUL         = (255, 255, 0)
+ORANSJE     = (255, 100, 0)
+ROD         = (255, 30, 30)
+NEON_LILLA  = (180, 0, 255)
+PLASM_BLA   = (0, 150, 255)
+
 class Partikkel:
     def __init__(self, x, y, farge, fart_x=-2):
         self.x, self.y = x, y
