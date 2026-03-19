@@ -13,24 +13,6 @@ ROD         = (255, 30, 30)
 NEON_LILLA  = (180, 0, 255)
 PLASM_BLA   = (0, 150, 255)
 
-class Partikkel:
-    def __init__(self, x, y, farge, fart_x=-2):
-        self.x, self.y = x, y
-        self.liv = random.randint(15, 25)
-        self.farge = farge
-        self.fart_x = fart_x + random.uniform(-1, 1)
-        self.fart_y = random.uniform(-1, 1)
-
-    def oppdater(self):
-        self.x += self.fart_x
-        self.y += self.fart_y
-        self.liv -= 1
-
-    def tegn(self):
-        if self.liv > 0:
-            str_str = max(1, self.liv // 5)
-            pygame.draw.circle(skjerm, self.farge, (int(self.x), int(self.y)), str_str)
-
 class Romskip:
     def __init__(self):
         self.x, self.y = 70, 300
@@ -88,7 +70,7 @@ class Romskip:
         pygame.draw.polygon(skjerm, (0, 60, 100), vindu)
         pygame.draw.polygon(skjerm, CYAN, vindu, 1)
 
-class Port:
+
     def __init__(self, x, fart):
         self.x = x
         self.bredde = 85
