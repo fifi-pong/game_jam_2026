@@ -4,6 +4,7 @@ import pygame, random
 class FlippJack:
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("FlippJack")
         self.skjerm = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
         self.keys = pygame.key.get_pressed()
