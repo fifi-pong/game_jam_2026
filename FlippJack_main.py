@@ -1,4 +1,5 @@
 import pygame, random
+import Spiller
 
 # 1. Oppsett
 class FlippJack:
