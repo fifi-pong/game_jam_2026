@@ -4,17 +4,17 @@ import pygame, random, math
 pygame.init()
 BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
-pygame.display.set_caption("Kanon med detaljerte raketter")
+pygame.display.set_caption("Kanon med mørke boomerang-raketter")
 klokke = pygame.time.Clock()
 
 # Fargepalett
 MORK_BLA    = (5, 5, 20)
 GRA         = (150, 150, 150)
 MORK_GRA    = (60, 60, 60)
+RAKETT_MORK = (30, 30, 40)  # Ny mørk farge for rakettkroppen
 ROD         = (200, 30, 30)
 ORANSJE     = (255, 120, 0)
 GUL         = (255, 230, 0)
-LYS_BLA     = (170, 220, 255) # For vinduet på raketten
 
 # --- KLASSER ---
 
@@ -47,60 +47,56 @@ class Kanon:
             v = (pygame.time.get_ticks() * 0.002) + (i * (math.pi / 2))
             pygame.draw.circle(skjerm, MORK_GRA, (int(self.x + math.cos(v)*20), int(self.y + math.sin(v)*20)), 4)
 
-class Rakett:
+class BoomerangRakett:
     def __init__(self, x, y, fart):
         self.x, self.y = x, y
         self.fart = fart
-        self.bredde = 35
-        self.hoyde = 16
+        self.lengde = 40  
+        self.bredde = 15  
         self.offset = random.random() * 10 
-        self.farge_kropp = (130, 130, 140)
+        self.farge_indre = RAKETT_MORK # Mørk indre farge
 
     def oppdater(self):
+        # Flytter raketten mot venstre
         self.x -= self.fart
         # Sinus-bølge for en "flyvende" effekt
         self.y += math.sin(pygame.time.get_ticks() * 0.005 + self.offset) * 2
 
     def tegn(self):
         # 1. FLAMME (Pulserende bak)
-        f_str = random.randint(15, 25)
-        # Ytre flamme (Oransje)
+        f_str = random.randint(10, 18)
+        flamme_start_x = self.x + self.lengde // 2
+        
+        # Ytre flamme
         pygame.draw.polygon(skjerm, ORANSJE, [
-            (self.x + self.bredde, self.y),
-            (self.x + self.bredde + f_str, self.y - 7),
-            (self.x + self.bredde + f_str + 5, self.y),
-            (self.x + self.bredde + f_str, self.y + 7)
+            (flamme_start_x, self.y),
+            (flamme_start_x + f_str, self.y - 5),
+            (flamme_start_x + f_str + 3, self.y),
+            (flamme_start_x + f_str, self.y + 5)
         ])
-        # Indre flamme (Gul)
-        pygame.draw.circle(skjerm, GUL, (int(self.x + self.bredde + 4), int(self.y)), 5)
+        # Indre flamme (Gul sirkel)
+        pygame.draw.circle(skjerm, GUL, (int(flamme_start_x + 3), int(self.y)), 3)
 
-        # 2. KROPP (Hoveddel)
-        pygame.draw.rect(skjerm, self.farge_kropp, (self.x, self.y - self.hoyde//2, self.bredde, self.hoyde))
-        # Detalj: En mørk stripe på midten for tekstur
-        pygame.draw.rect(skjerm, MORK_GRA, (self.x + 10, self.y - self.hoyde//2, 5, self.hoyde))
+        # 2. BOOMERANG-PIL FORM (Mørk farge)
+        punkter = [
+            (self.x, self.y),                                      # Spissen (venstre)
+            (self.x + self.lengde // 2, self.y - self.bredde // 2), # Øvre bøy bak
+            (self.x + self.lengde, self.y - self.bredde // 4),      # Øvre ende
+            (self.x + self.lengde // 2, self.y),                   # Midtpunkt bak
+            (self.x + self.lengde, self.y + self.bredde // 4),      # Nedre ende
+            (self.x + self.lengde // 2, self.y + self.bredde // 2), # Nedre bøy bak
+        ]
+        
+        # Tegner selve formen med den nye mørke fargen
+        pygame.draw.polygon(skjerm, self.farge_indre, punkter)
+        # Legger til en rød kantlinje så den ikke forsvinner helt i bakgrunnen
+        pygame.draw.polygon(skjerm, ROD, punkter, 2)
 
-        # 3. SPISS (Trekant foran)
+        # 3. DETALJ: Liten rød spiss helt foran
         pygame.draw.polygon(skjerm, ROD, [
-            (self.x, self.y - self.hoyde//2),
-            (self.x - 15, self.y),
-            (self.x, self.y + self.hoyde//2)
-        ])
-
-        # 4. VINDU (Liten cockpit)
-        pygame.draw.circle(skjerm, LYS_BLA, (int(self.x + 5), int(self.y)), 4)
-
-        # 5. FINNER (Vinger bak)
-        # Øvre finne
-        pygame.draw.polygon(skjerm, ROD, [
-            (self.x + self.bredde - 10, self.y - self.hoyde//2),
-            (self.x + self.bredde + 5, self.y - self.hoyde//2 - 8),
-            (self.x + self.bredde, self.y - self.hoyde//2)
-        ])
-        # Nedre finne
-        pygame.draw.polygon(skjerm, ROD, [
-            (self.x + self.bredde - 10, self.y + self.hoyde//2),
-            (self.x + self.bredde + 5, self.y + self.hoyde//2 + 8),
-            (self.x + self.bredde, self.y + self.hoyde//2)
+            (self.x, self.y),
+            (self.x + 8, self.y - 3),
+            (self.x + 8, self.y + 3)
         ])
 
 # --- HOVEDLØKKE ---
@@ -120,7 +116,7 @@ while kjorer:
         
         if event.type == SKYT_TIMER:
             start_x = kanon.x - kanon.lop_lengde
-            raketter.append(Rakett(start_x, kanon.y, random.randint(5, 8)))
+            raketter.append(BoomerangRakett(start_x, kanon.y, random.randint(5, 8)))
 
     # Oppdatering
     kanon.oppdater()
