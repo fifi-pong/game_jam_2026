@@ -1,6 +1,4 @@
-import pygame
-import random
-import math
+import pygame, random, math
 
 BREDDE, HOYDE = 800, 600
 MORK_BLA    = (5, 5, 20)
@@ -53,16 +51,6 @@ class BoomerangRakett:
         self.y += math.sin(pygame.time.get_ticks() * 0.005 + self.offset) * 2
 
     def tegn(self, skjerm):
-        # 1. FLAMME
-        f_str = random.randint(10, 18)
-        flamme_x = self.x + self.lengde // 2
-        pygame.draw.polygon(skjerm, ORANSJE, [
-            (flamme_x, self.y),
-            (flamme_x + f_str, self.y - 5),
-            (flamme_x + f_str + 3, self.y),
-            (flamme_x + f_str, self.y + 5)
-        ])
-        pygame.draw.circle(skjerm, GUL, (int(flamme_x + 3), int(self.y)), 3)
 
         # 2. KROPP
         punkter = [
