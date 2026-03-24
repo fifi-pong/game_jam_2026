@@ -31,6 +31,9 @@ class FlippJack:
         self.running = True
 
         self.spiller = Romskip(70, 300)
+        self.kanon = Kanon(BREDDE - 10)
+        self.kuler = []
+        self.skyt_timer = 0  # teller opp tid i millisekunder
 
     def main_loop(self):
         self.handel_event()
@@ -50,13 +53,29 @@ class FlippJack:
         ned = self.keys[pygame.K_DOWN]
         venstre = self.keys[pygame.K_LEFT]
         hoyre = self.keys[pygame.K_RIGHT]
-
         self.spiller.update(opp, ned, venstre, hoyre)
+
+        self.kanon.update()
+        for kule in self.kuler[:]:
+            kule.update()
+            if kule.x < -50:
+                self.kuler.remove(kule)
+        
+        # Automatisk skyting
+        self.skyt_timer += clock.get_time()
+        if self.skyt_timer >= 800:
+            ny_kule = Kanon_Kule(self.kanon.x - 50, self.kanon.y, random.randint(4, 8))
+            self.kuler.append(ny_kule)
+            self.skyt_timer = 0
+
         clock.tick(60)
 
     def render(self):
         skjerm.fill(MORK_BLA)
-        self.spiller.tegn(False)  # bruker din fancy tegning
+        self.spiller.tegn(False)
+        self.kanon.tegn()
+        for kule in self.kuler:
+            kule.tegn()
         pygame.display.flip()
 
     
@@ -165,10 +184,50 @@ class Laser(Objecter):
         super().__init__()
         pass
 
-class Kanon(Objecter):
-    def __init__(self):
-        super().__init__()
-        pass
+class Kanon: 
+    def __init__(self, x):
+        self.x = x
+        self.y = HOYDE // 2
+        self.fart = 2  # Hvor fort kanonen flytter seg opp/ned
+        self.retning = 1 # 1 er ned, -1 er opp
+        self.lengde = 50
+        self.bredde = 35
+
+    def update(self):
+        # Flytter kanonen opp eller ned
+        self.y += self.fart * self.retning
+        
+        # Snu retning hvis den treffer topp eller bunn
+        if self.y <= 50 or self.y >= HOYDE - 50:
+            self.retning *= -1
+
+    def tegn(self):
+        # Tegner kanonløpet pekende mot venstre
+        pygame.draw.rect(skjerm, GRA, (self.x - self.lengde, self.y - self.bredde//2, self.lengde, self.bredde))
+        # Tegner basen til kanonen
+        pygame.draw.circle(skjerm, MORK_GRA, (self.x, self.y), 30)
+
+class Kanon_Kule:
+    def __init__(self, x, y, fart):
+        self.x, self.y = x, y
+        self.radius = 15
+        self.fart = fart
+        self.offset = random.random() * 10
+        self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius*2, self.radius*2)
+
+    def update(self):
+        self.x -= self.fart
+        self.y += math.sin(pygame.time.get_ticks() * 0.005 + self.offset) * 2
+        self.rect.center = (self.x, self.y)
+
+    def tegn(self):
+        for i in range(8):
+            v = i * (math.pi/4) + (pygame.time.get_ticks() * 0.01)
+            pygame.draw.line(skjerm, ROD, (self.x, self.y), (self.x + math.cos(v)*22, self.y + math.sin(v)*22), 2)
+        
+        farge = ROD if (pygame.time.get_ticks() // 200) % 2 == 0 else (50, 0, 0)
+        pygame.draw.circle(skjerm, farge, (int(self.x), int(self.y)), self.radius)
+
 
 class Vegger(Objecter):
     def __init__(self):
