@@ -51,8 +51,6 @@ class BoomerangRakett:
         self.y += math.sin(pygame.time.get_ticks() * 0.005 + self.offset) * 2
 
     def tegn(self, skjerm):
-
-        # 2. KROPP
         punkter = [
             (self.x, self.y),
             (self.x + self.lengde // 2, self.y - self.bredde // 2),
