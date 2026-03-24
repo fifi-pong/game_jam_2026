@@ -1,5 +1,5 @@
 import pygame, random, math
-
+ 
 BREDDE, HOYDE = 800, 600
 MORK_BLA    = (5, 5, 20)
 GRA         = (150, 150, 150)
