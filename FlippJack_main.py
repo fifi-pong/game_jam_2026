@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 
 # --- FARGER ---
 MORK_BLA    = (5, 5, 20)
+BLACK       = (0, 0, 0)
 HVIT        = (255, 255, 255)
 GRA         = (150, 150, 150)
 MORK_GRA    = (60, 60, 60)
@@ -16,6 +17,7 @@ CYAN        = (0, 255, 255)
 GUL         = (255, 255, 0)
 ORANSJE     = (255, 100, 0)
 ROD         = (255, 30, 30)
+LYSE_ROD    = (247, 64, 64)
 NEON_LILLA  = (180, 0, 255)
 PLASM_BLA   = (0, 150, 255)
 
@@ -34,6 +36,8 @@ class FlippJack:
         self.kanon = Kanon(BREDDE - 10)
         self.kuler = []
         self.skyt_timer = 0  # teller opp tid i millisekunder
+
+        self.laser = Laser(BREDDE // 2)
 
     def main_loop(self):
         self.handel_event()
@@ -68,6 +72,8 @@ class FlippJack:
             self.kuler.append(ny_kule)
             self.skyt_timer = 0
 
+        self.laser.update()
+
         clock.tick(60)
 
     def render(self):
@@ -76,7 +82,9 @@ class FlippJack:
         self.kanon.tegn()
         for kule in self.kuler:
             kule.tegn()
+        self.laser.tegn()
         pygame.display.flip()
+
 
     
 #gjennerel oppsett
@@ -177,12 +185,6 @@ class Romskip(Objecter):
         pygame.draw.polygon(skjerm, (0, 60, 100), vindu)
         pygame.draw.polygon(skjerm, CYAN, vindu, 1)
         
-        
-
-class Laser(Objecter):
-    def __init__(self):
-        super().__init__()
-        pass
 
 class Kanon: 
     def __init__(self, x):
@@ -233,6 +235,49 @@ class Vegger(Objecter):
     def __init__(self):
         super().__init__()
         pass
+
+class Laser(Objecter):
+    def __init__(self, x):
+        self.x = x
+        self.y = random.randint(35, 565)
+        self.width = 800
+        self.height = 10
+        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
+        self.timer = 0
+        self.color = LYSE_ROD
+
+    def update(self):
+        if self.timer>100 and self.timer <320:
+            self.color = ROD
+            self.height = 35
+        
+        else: 
+            self.color = LYSE_ROD
+            self.height = 10
+        self.timer += 1
+    
+        if self.timer >= 420:  # 7 sekunder
+            self.y = random.randint(35, 565)
+            self.timer = 0
+
+
+        if pygame.Rect.colliderect(self.rect, spill.spiller.rect):
+            if self.color == ROD:
+                spill.running = False
+            pass
+
+        self.rect = pygame.Rect(
+            self.x - self.width // 2,
+            self.y - self.height // 2,
+            self.width,
+            self.height
+    )
+
+    def tegn(self):
+        pygame.draw.rect(skjerm, self.color, self.rect)
+
+
+
 
 spill = FlippJack()
 while spill.running:
