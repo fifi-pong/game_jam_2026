@@ -1,13 +1,11 @@
 import pygame, random, math
 import FlippJack_main
 
-# --- OPPSETT OG FARGER ---
 pygame.init()
 BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
 klokke = pygame.time.Clock()
 
-# --- FARGER ---
 MORK_BLA    = (5, 5, 20)
 HVIT        = (255, 255, 255)
 GRA         = (150, 150, 150)
