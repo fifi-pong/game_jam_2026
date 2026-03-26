@@ -21,7 +21,6 @@ RAKETT_MORK = (30, 30, 40)
 
 font_stor = pygame.font.SysFont("Arial", 26, bold=True)
 
-# --- Klasser ---
 
 class Objecter:
     def __init__(self, x, y, bredde, hoyde):
@@ -202,7 +201,6 @@ class Laser:
         else:
             pygame.draw.rect(skjerm, self.color, self.rect)
 
-# --- Spillmotor ---
 class FlippJack:
     def __init__(self):
         self.running = True
@@ -256,7 +254,6 @@ class FlippJack:
         skjerm.blit(score_text, (BREDDE//2 - 40, 20))
         pygame.display.flip()
 
-# --- Start ---
 spill = FlippJack()
 while spill.running:
     spill.update()
