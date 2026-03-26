@@ -8,6 +8,7 @@ import pygame
 class MenuState(BaseState):
     def __init__(self):
         super().__init__()
+        
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
