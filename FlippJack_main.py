@@ -37,6 +37,10 @@ class FlippJack:
 
         self.laser = Laser(BREDDE // 2)
 
+        self.vegg = Vegg()
+
+        self.poeng = 0
+
     def main_loop(self):
         self.handel_event()
         self.update()
@@ -50,13 +54,15 @@ class FlippJack:
         self.keys = pygame.key.get_pressed()
 
     def update(self):
-
+        dt = clock.tick(60) / 1000
+        #spilleren
         opp = self.keys[pygame.K_UP]
         ned = self.keys[pygame.K_DOWN]
         venstre = self.keys[pygame.K_LEFT]
         hoyre = self.keys[pygame.K_RIGHT]
         self.spiller.update(opp, ned, venstre, hoyre)
 
+        #kanonen
         self.kanon.update()
         for kule in self.kuler[:]:
             kule.update()
@@ -72,15 +78,20 @@ class FlippJack:
 
         self.laser.update()
 
-        clock.tick(60)
-
+        self.vegg.update()
+        self.poeng += dt
+    
     def render(self):
         skjerm.fill(MORK_BLA)
         self.spiller.tegn(False)
+        self.vegg.tegn(skjerm)
         self.kanon.tegn()
         for kule in self.kuler:
             kule.tegn()
         self.laser.tegn()
+
+        score_text = font_stor.render(f"{round(self.poeng)}", True, HVIT)
+        skjerm.blit(score_text, (350, 20))
         pygame.display.flip()
 
 
@@ -219,6 +230,11 @@ class Kanon_Kule:
         self.x -= self.fart
         self.y += math.sin(pygame.time.get_ticks() * 0.005 + self.offset) * 2
         self.rect.center = (self.x, self.y)
+        
+
+        if pygame.Rect.colliderect(self.rect, spill.spiller.rect):
+            spill.running = False
+    
 
     def tegn(self):
         for i in range(8):
@@ -229,10 +245,48 @@ class Kanon_Kule:
         pygame.draw.circle(skjerm, farge, (int(self.x), int(self.y)), self.radius)
 
 
-class Vegger(Objecter):
+class Vegg:
     def __init__(self):
-        super().__init__()
-        pass
+        self.w = 15
+        self.aktiv = False
+        self._reset()
+
+    def _reset(self):
+        """Setter veggen til en ny tilfeldig tilstand på høyre side"""
+        self.x = BREDDE + 50
+        # Tilfeldig høyde
+        self.h = random.randint(100, 250)
+        # Tilfeldig vertikal posisjon, men ikke for høyt oppe
+        self.y = random.randint(50, HOYDE - self.h - 50)
+        # Sakket ned farten (før 3-6, nå 1-3)
+        self.fart = random.randint(1, 3)
+        self.aktiv = True
+
+    def update(self):
+        if self.aktiv:
+            self.x -= self.fart
+            # Hvis den forsvinner ut til venstre
+
+            # Lag rect hver frame
+            self.rect = pygame.Rect(self.x, self.y, self.w, self.h)
+
+            if self.x + self.w < 0:
+                self.aktiv = False
+        else:
+            # Sjanse for å dukke opp igjen
+            if random.random() < 0.01:
+                self._reset()
+
+        # Kollisjonssjekk
+        if self.aktiv and pygame.Rect.colliderect(self.rect, spill.spiller.rect):
+            spill.running = False
+
+
+    def tegn(self, skjerm):
+        if self.aktiv:
+            pygame.draw.rect(skjerm, GRA, (self.x, self.y, self.w, self.h))
+            pygame.draw.rect(skjerm, ROD, (self.x, self.y, self.w, self.h), 1)
+
 
 class Laser(Objecter):
     def __init__(self, x):
@@ -245,20 +299,23 @@ class Laser(Objecter):
         self.color = LYSE_ROD
 
     def update(self):
+        # Setter fargen og bredden til rød når timer er mellom 100 og 320
         if self.timer>100 and self.timer <320:
             self.color = ROD
             self.height = 35
-        
+        # Hvis ikke skal den være lyse rød og tynn
         else: 
             self.color = LYSE_ROD
             self.height = 10
+
         self.timer += 1
     
+        # Hvert 7 sekund flytter den laseren og nulstiller timeren
         if self.timer >= 420:  # 7 sekunder
             self.y = random.randint(35, 565)
             self.timer = 0
 
-
+        # Setter at den kun koliderer når laseren er rød
         if pygame.Rect.colliderect(self.rect, spill.spiller.rect):
             if self.color == ROD:
                 spill.running = False
