@@ -1,13 +1,11 @@
 import pygame, random, math, sys
 
-# --- KONFIGURASJON ---
 pygame.init()
 BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
 pygame.display.set_caption("FlippJack")
 clock = pygame.time.Clock()
 
-# --- FARGER ---
 MORK_BLA    = (5, 5, 20)
 BLACK       = (0, 0, 0)
 HVIT        = (255, 255, 255)
