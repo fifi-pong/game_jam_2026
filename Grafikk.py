@@ -1,1 +1,0 @@
-# Selve Grafikke til spillet
