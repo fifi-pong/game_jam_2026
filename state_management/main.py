@@ -7,10 +7,11 @@ from states.base_state import BaseState
 from states.menu_state import MenuState
 from states.game_state import GameState
 
+
 class Spill:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((500, 500))
+        self.screen = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {

@@ -94,7 +94,6 @@ class FlippJack:
         skjerm.blit(score_text, (350, 20))
         pygame.display.flip()
 
-
     
 #gjennerel oppsett
 class Objecter:
@@ -111,7 +110,6 @@ class Objecter:
 
     def render(self):
         pass
-
 
 
 class Romskip(Objecter):
@@ -217,6 +215,7 @@ class Kanon:
         pygame.draw.rect(skjerm, GRA, (self.x - self.lengde, self.y - self.bredde//2, self.lengde, self.bredde))
         # Tegner basen til kanonen
         pygame.draw.circle(skjerm, MORK_GRA, (self.x, self.y), 30)
+
 
 class Kanon_Kule:
     def __init__(self, x, y, fart):
