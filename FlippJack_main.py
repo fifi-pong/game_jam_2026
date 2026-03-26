@@ -1,6 +1,5 @@
 import pygame, random, math, sys
 
-# --- Initialisering og farger ---
 pygame.init()
 BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
@@ -20,7 +19,6 @@ PLASM_BLA   = (0, 150, 255)
 RAKETT_MORK = (30, 30, 40)
 
 font_stor = pygame.font.SysFont("Arial", 26, bold=True)
-
 
 class Objecter:
     def __init__(self, x, y, bredde, hoyde):
@@ -93,14 +91,11 @@ class Kanon:
             self.retning *= -1
 
     def tegn(self):
-        # Kanonløp
         pygame.draw.rect(skjerm, MORK_GRA, (self.x - 40, self.y - 18, 40, 36))
         pygame.draw.rect(skjerm, GRA, (self.x - 70, self.y - 12, 35, 24))
         pygame.draw.rect(skjerm, (80, 80, 80), (self.x - 75, self.y - 15, 5, 30))
-        # Base
         pygame.draw.circle(skjerm, (80, 80, 80), (self.x, self.y), 35)
         pygame.draw.circle(skjerm, GRA, (self.x, self.y), 30)
-        # Roterende detaljer
         for i in range(4):
             v = (pygame.time.get_ticks() * 0.002) + (i * (math.pi / 2))
             pygame.draw.circle(skjerm, MORK_GRA, (int(self.x + math.cos(v)*20), int(self.y + math.sin(v)*20)), 4)
@@ -120,21 +115,14 @@ class BoomerangRakett:
         self.rect.topleft = (self.x, self.y - self.bredde//2)
 
     def tegn(self):
-        # Flamme bak
         f_str = random.randint(10, 18)
         flamme_x = self.x + self.lengde // 2
         pygame.draw.polygon(skjerm, ORANSJE, [(flamme_x, self.y), (flamme_x + f_str, self.y - 5), (flamme_x + f_str + 3, self.y), (flamme_x + f_str, self.y + 5)])
         pygame.draw.circle(skjerm, GUL, (int(flamme_x + 3), int(self.y)), 3)
 
-        # Boomerang-kropp
-        punkter = [
-            (self.x, self.y),
-            (self.x + self.lengde // 2, self.y - self.bredde // 2),
-            (self.x + self.lengde, self.y - self.bredde // 4),
-            (self.x + self.lengde // 2, self.y),
-            (self.x + self.lengde, self.y + self.bredde // 4),
-            (self.x + self.lengde // 2, self.y + self.bredde // 2),
-        ]
+        punkter = [(self.x, self.y), (self.x + self.lengde // 2, self.y - self.bredde // 2),
+                   (self.x + self.lengde, self.y - self.bredde // 4), (self.x + self.lengde // 2, self.y),
+                   (self.x + self.lengde, self.y + self.bredde // 4), (self.x + self.lengde // 2, self.y + self.bredde // 2)]
         pygame.draw.polygon(skjerm, RAKETT_MORK, punkter)
         pygame.draw.polygon(skjerm, ROD, punkter, 2)
 
@@ -190,11 +178,9 @@ class Laser:
 
     def tegn(self):
         if self.color == ROD:
-            # Glødende effekt
             pygame.draw.rect(skjerm, ORANSJE, (0, self.rect.y - 2, BREDDE, self.rect.height + 4))
             pygame.draw.rect(skjerm, self.color, self.rect)
             pygame.draw.rect(skjerm, HVIT, (0, self.rect.y + self.height//3, BREDDE, self.height//3))
-            # Gnister
             for _ in range(3):
                 gx = random.randint(0, BREDDE)
                 pygame.draw.line(skjerm, CYAN, (gx, self.y-10), (gx+10, self.y+10), 1)
@@ -211,7 +197,14 @@ class FlippJack:
         self.laser = Laser()
         self.vegg = Vegg()
         self.poeng = 0
-        self.keys = pygame.key.get_pressed()
+        
+        try:
+            self.bakgrunn_img = pygame.image.load("pixel-art-galaxy_2.jpg").convert()
+            self.bakgrunn = pygame.transform.scale(self.bakgrunn_img, (BREDDE, HOYDE))
+        except:
+            # Fallback hvis filen mangler
+            self.bakgrunn = pygame.Surface((BREDDE, HOYDE))
+            self.bakgrunn.fill(MORK_BLA)
 
     def update(self):
         dt = clock.tick(60) / 1000
@@ -219,21 +212,19 @@ class FlippJack:
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT: self.running = False
-        self.keys = pygame.key.get_pressed()
+        
+        keys = pygame.key.get_pressed()
 
-        # Oppdateringer
-        self.spiller.update(self.keys[pygame.K_UP], self.keys[pygame.K_DOWN], self.keys[pygame.K_LEFT], self.keys[pygame.K_RIGHT])
+        self.spiller.update(keys[pygame.K_UP], keys[pygame.K_DOWN], keys[pygame.K_LEFT], keys[pygame.K_RIGHT])
         self.kanon.update()
         self.laser.update()
         self.vegg.update()
 
-        # Skyting
         self.skyt_timer += clock.get_time()
         if self.skyt_timer >= 850:
             self.kuler.append(BoomerangRakett(self.kanon.x - 75, self.kanon.y, random.randint(5, 8)))
             self.skyt_timer = 0
 
-        # Kollisjonssjekker
         for kule in self.kuler[:]:
             kule.update()
             if kule.rect.colliderect(self.spiller.rect): self.running = False
@@ -243,15 +234,21 @@ class FlippJack:
         if self.vegg.aktiv and self.vegg.rect.colliderect(self.spiller.rect): self.running = False
 
     def render(self):
-        skjerm.fill(MORK_BLA)
+        # 1. Tegn bakgrunnen først
+        skjerm.blit(self.bakgrunn, (0, 0))
+        
+        # 2. Tegn alle objekter
         self.vegg.tegn()
-        for kule in self.kuler: kule.tegn()
+        for kule in self.kuler: 
+            kule.tegn()
         self.kanon.tegn()
         self.laser.tegn()
         self.spiller.tegn()
         
+        # 3. Tegn UI (Score)
         score_text = font_stor.render(f"SCORE: {int(self.poeng)}", True, HVIT)
         skjerm.blit(score_text, (BREDDE//2 - 40, 20))
+        
         pygame.display.flip()
 
 spill = FlippJack()
