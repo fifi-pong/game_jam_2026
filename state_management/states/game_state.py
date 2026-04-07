@@ -114,7 +114,6 @@ class GameState(BaseState):
             if kule.rect.colliderect(self.spiller.rect):
                 if self.skjold_tid <= 0:
                     self.running = False
-                self.running = False
             if kule.x < -100: self.kuler.remove(kule)
 
         if self.vegg.aktiv and self.vegg.rect.colliderect(self.spiller.rect): 
