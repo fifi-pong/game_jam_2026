@@ -39,10 +39,16 @@ class GameState(BaseState):
         self.skyt_timer = 0
         self.vegg = Vegg()
         self.laser = Laser()
+        self.totaltid = 0
 
         self.spiller = Romskip(70, 300)
 
         self.poeng = 0
+
+        self.skjold_tid = 0
+        self.powerup_timer = 0
+        self.bonuser = []
+        self.neste_powerup = random.uniform(5, 10)  # mellom 5–10 sek
 
         try:
             self.bakgrunn_img = pygame.image.load("pix_art.jpg").convert()
@@ -65,7 +71,8 @@ class GameState(BaseState):
             self.keys = pygame.key.get_pressed()
 
     def update(self, dt: float):
-
+        if self.skjold_tid > 0: self.skjold_tid -= 1
+        spill_fart = 3 + (self.poeng // 5) * 0.4
         dt = clock.tick(60) / 1000
         self.poeng += dt
         #spilleren
@@ -86,14 +93,37 @@ class GameState(BaseState):
             self.kuler.append(BoomerangRakett(self.kanon.x - 75, self.kanon.y, random.randint(5, 8)))
             self.skyt_timer = 0
 
+        # Power up
+        self.powerup_timer += dt
+
+        if self.powerup_timer >= self.neste_powerup:
+            self.bonuser.append(PowerUp(BREDDE + 50, spill_fart))
+            self.powerup_timer = 0
+            self.neste_powerup = random.uniform(5, 10)
+        
+
+
         # Kollisjonssjekker
+        for b in self.bonuser[:]:
+            b.oppdater()
+            if self.spiller.rect.colliderect(b.rect): self.skjold_tid = 180; self.bonuser.remove(b)
+            elif b.x < -100: self.bonuser.remove(b)
+
         for kule in self.kuler[:]:
             kule.update()
-            if kule.rect.colliderect(self.spiller.rect): self.running = False
+            if kule.rect.colliderect(self.spiller.rect):
+                if self.skjold_tid <= 0:
+                    self.running = False
+                self.running = False
             if kule.x < -100: self.kuler.remove(kule)
 
-        if self.vegg.aktiv and self.vegg.rect.colliderect(self.spiller.rect): self.running = False
-        if self.laser.color == ROD and self.laser.rect.colliderect(self.spiller.rect): self.running = False
+        if self.vegg.aktiv and self.vegg.rect.colliderect(self.spiller.rect): 
+                if self.skjold_tid <= 0:
+                    self.running = False
+        if self.laser.color == ROD and self.laser.rect.colliderect(self.spiller.rect): 
+            if self.skjold_tid <= 0:
+                self.running = False
+    
 
 
         if not self.running:
@@ -101,17 +131,15 @@ class GameState(BaseState):
             self.done = True
             self.next_state = "MENU"
 
-        
-
 
     def draw(self, skjerm):
         # 1. Tegn bakgrunnen først
         skjerm.blit(self.bakgrunn, (0, 0))
 
-
+        for b in self.bonuser: b.tegn()
         self.laser.tegn()
         self.vegg.tegn()
-        self.spiller.tegn(False)
+        self.spiller.tegn(self.skjold_tid > 0)
         for kule in self.kuler: kule.tegn()
         self.kanon.tegn()
 
@@ -119,10 +147,7 @@ class GameState(BaseState):
         skjerm.blit(score_text, (BREDDE//2 - 40, 20))
 
         pygame.display.flip()
-
-
         
-
 
 class Objecter:
     def __init__(self, x, y, bredde, hoyde):
@@ -337,3 +362,20 @@ class Laser:
                 pygame.draw.line(skjerm, CYAN, (gx, self.y-10), (gx+10, self.y+10), 1)
         else:
             pygame.draw.rect(skjerm, self.color, self.rect)
+
+class PowerUp:
+    def __init__(self, x, fart):
+        self.x, self.y = x, random.randint(150, 450)
+        self.fart = 3
+        self.rect = pygame.Rect(self.x - 10, self.y - 10, 20, 20)
+
+    def oppdater(self):
+        self.x -= self.fart
+        self.rect.x = self.x
+
+    def tegn(self):
+        v = pygame.time.get_ticks() * 0.005
+        s = 12 + math.sin(v) * 3
+        pygame.draw.rect(skjerm, (0, 255, 100), (self.x - s, self.y - s, s*2, s*2), 2)
+        pygame.draw.line(skjerm, HVIT, (self.x-6, self.y), (self.x+6, self.y), 3)
+        pygame.draw.line(skjerm, HVIT, (self.x, self.y-6), (self.x, self.y+6), 3)
