@@ -199,7 +199,7 @@ class FlippJack:
         self.poeng = 0
         
         try:
-            self.bakgrunn_img = pygame.image.load("pixel-art-galaxy_2.jpg").convert()
+            self.bakgrunn_img = pygame.image.load("pix_art.jpg").convert()
             self.bakgrunn = pygame.transform.scale(self.bakgrunn_img, (BREDDE, HOYDE))
         except:
             # Fallback hvis filen mangler

@@ -5,9 +5,22 @@ Dette er staten for hovedmenyen.
 from states.base_state import BaseState
 import pygame
 
+BREDDE, HOYDE = 800, 600
+skjerm = pygame.display.set_mode((BREDDE, HOYDE))
+
+MORK_BLA    = (5, 5, 20)
+
 class MenuState(BaseState):
     def __init__(self):
         super().__init__()
+
+        try:
+            self.bakgrunn_img = pygame.image.load("pix_art.jpg").convert()
+            self.bakgrunn = pygame.transform.scale(self.bakgrunn_img, (BREDDE, HOYDE))
+        except:
+            # Fallback hvis filen mangler
+            self.bakgrunn = pygame.Surface((BREDDE, HOYDE))
+            self.bakgrunn.fill(MORK_BLA)
         
 
     def handle_events(self, events : list[pygame.event.Event]):
@@ -25,5 +38,6 @@ class MenuState(BaseState):
         pass
 
     def draw(self, surface: pygame.Surface):
-        surface.fill((255, 0, 0))
+        # 1. Tegn bakgrunnen først
+        skjerm.blit(self.bakgrunn, (0, 0))
         self.draw_text(surface, "Du er i hovedmenyen! Trykk SPACE for å starte.", self.font, (255, 255, 255), (250, 250))

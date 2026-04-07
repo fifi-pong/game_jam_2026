@@ -6,12 +6,15 @@ import pygame
 from states.base_state import BaseState
 from states.menu_state import MenuState
 from states.game_state import GameState
+BREDDE, HOYDE = 800, 600
+skjerm = pygame.display.set_mode((BREDDE, HOYDE))
+
 
 
 class Spill:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))
+
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {
@@ -49,7 +52,7 @@ class Spill:
 
     def render(self):
         # Tegner state
-        self.current_state.draw(self.screen)
+        self.current_state.draw(skjerm)
         pygame.display.flip()
 
 spill = Spill()
