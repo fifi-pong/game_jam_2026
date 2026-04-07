@@ -14,7 +14,7 @@ skjerm = pygame.display.set_mode((BREDDE, HOYDE))
 class Spill:
     def __init__(self):
         pygame.init()
-
+        pygame.font.init()
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {

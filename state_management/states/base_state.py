@@ -20,6 +20,8 @@ class BaseState(ABC):
         self.done = False
         self.next_state = None
         self.font = pygame.font.SysFont(None, 20)
+        font_stor = pygame.font.SysFont("Arial", 26, bold=True)
+        font_liten = pygame.font.SysFont("Arial", 16, bold=True)
 
     def draw_text(self, surface : pygame.Surface, string : str, font : pygame.font.Font, color : tuple, center : tuple):
         # Lager tekst. Andre parameter er anti-alias. Sett til True for glatt og fin tekst.

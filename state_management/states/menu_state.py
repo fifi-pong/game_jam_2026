@@ -9,6 +9,8 @@ BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
 
 MORK_BLA    = (5, 5, 20)
+HVIT        = (255, 255, 255)
+GUL         = (255, 255, 0)
 
 class MenuState(BaseState):
     def __init__(self):
@@ -46,4 +48,7 @@ class MenuState(BaseState):
         
         surface.blit(self.bakgrunn, (0, 0))
         surface.blit(self.mork_film, (0, 0))
-        self.draw_text(surface, "Du er i hovedmenyen! Trykk SPACE for å starte.", self.font, (255, 255, 255,), (250, 250))
+
+        # Tekst på Skjermen
+        self.draw_text(surface, "Du er i hovedmenyen! Trykk SPACE for å starte.", 
+                        self.font, HVIT, (BREDDE // 2 - 200, HOYDE // 2 - 50))
