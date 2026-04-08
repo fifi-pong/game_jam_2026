@@ -5,16 +5,17 @@ En generell spill-klasse. Dette er hovedprogrammet.
 import pygame
 from states.base_state import BaseState
 from states.menu_state import MenuState
-from states.game_state import GameState
+from states.game_state import GameState 
 BREDDE, HOYDE = 800, 600
 skjerm = pygame.display.set_mode((BREDDE, HOYDE))
-
 
 
 class Spill:
     def __init__(self):
         pygame.init()
         pygame.font.init()
+        pygame.mixer.init() 
+        pygame.mixer.init()
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {
@@ -22,6 +23,11 @@ class Spill:
             "GAME": GameState()
         }
         self.current_state = self.states["MENU"]
+
+        # bakgrunnsmusikken
+        pygame.mixer.music.load("spillsang.mp3.mp3")
+        pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+        pygame.mixer.music.play(-1)  # -1 = loop forever
 
     def main_loop(self):
         self.handle_events()

@@ -119,12 +119,11 @@ class GameState(BaseState):
         if self.vegg.aktiv and self.vegg.rect.colliderect(self.spiller.rect): 
                 if self.skjold_tid <= 0:
                     self.running = False
+
         if self.laser.color == ROD and self.laser.rect.colliderect(self.spiller.rect): 
             if self.skjold_tid <= 0:
                 self.running = False
-    
-
-
+     
         if not self.running:
             self.__init__()
             self.done = True
